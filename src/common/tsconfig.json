@@ -1,0 +1,11 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"lib": ["ES2024"],
+		"types": [],
+		"composite": true,
+		"outDir": "../../dist/common",
+		"rootDir": "."
+	},
+	"include": ["./**/*.ts"]
+}

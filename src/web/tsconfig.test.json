@@ -1,0 +1,10 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"types": ["vite/client", "vitest/globals"],
+		"rootDir": "..",
+		"outDir": "../../dist/web-test-tsc"
+	},
+	"include": ["./**/*.test.ts", "./**/*.test.tsx"],
+	"exclude": []
+}

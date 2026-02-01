@@ -1,0 +1,40 @@
+# DISABLED: Enable this workflow after setting up npm publishing
+# To enable: uncomment the 'push' trigger below and add NPM_TOKEN secret
+name: Release
+
+on:
+  # push:
+  #   tags:
+  #     - "v*"
+  workflow_dispatch:  # Manual trigger only for now
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm run build:cli:bundle
+
+      # Publish to npm (requires NPM_TOKEN secret)
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Create GitHub Release with bundled CLI
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/nudj.js
+          generate_release_notes: true
