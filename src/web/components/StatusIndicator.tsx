@@ -1,4 +1,5 @@
 import type {Component} from "solid-js";
+import styles from "./StatusIndicator.module.css";
 
 export interface StatusIndicatorProps {
 	type: "success" | "warning";
@@ -7,11 +8,11 @@ export interface StatusIndicatorProps {
 
 export const StatusIndicator: Component<StatusIndicatorProps> = (props) => {
 	return (
-		<div class={`status-indicator status-indicator--${props.type}`}>
-			<span class="status-indicator__icon">
+		<div class={styles.indicator} classList={{[styles[props.type]!]: true}}>
+			<span class={styles.icon}>
 				{props.type === "success" ? "✓" : "⚠"}
 			</span>
-			<span class="status-indicator__text">{props.text}</span>
+			<span>{props.text}</span>
 		</div>
 	);
 };

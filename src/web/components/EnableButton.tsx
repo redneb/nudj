@@ -1,4 +1,5 @@
 import {type Component, createSignal} from "solid-js";
+import styles from "./EnableButton.module.css";
 
 export interface EnableButtonProps {
 	onEnable: () => Promise<void>;
@@ -19,7 +20,7 @@ export const EnableButton: Component<EnableButtonProps> = (props) => {
 
 	return (
 		<button
-			class="enable-button"
+			class={styles.button}
 			onClick={handleClick}
 			disabled={isLoading()}
 		>

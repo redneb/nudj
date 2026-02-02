@@ -1,0 +1,17 @@
+.logo {
+	display: contents;
+	color: var(--color-text);
+}
+
+.logo :global(svg) {
+	width: 120px;
+	height: 120px;
+	margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 480px) {
+	.logo :global(svg) {
+		width: 100px;
+		height: 100px;
+	}
+}

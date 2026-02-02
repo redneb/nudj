@@ -16,6 +16,7 @@ import {
 	registerServiceWorker,
 } from "./lib/push.ts";
 import {generatePairingCode} from "./lib/pairing.ts";
+import styles from "./App.module.css";
 
 type AppState = "loading" | "unsupported" | "prompt" | "denied" | "enabled";
 
@@ -114,21 +115,21 @@ export const App: Component = () => {
 	};
 
 	return (
-		<div class="app">
-			<header class="header">
+		<div class={styles.app}>
+			<header class={styles.header}>
 				<Logo />
-				<h1 class="title">nudj</h1>
+				<h1 class={styles.title}>nudj</h1>
 			</header>
 
-			<main class="main">
+			<main class={styles.main}>
 				<Switch>
 					<Match when={state() === "loading"}>
-						<div class="loading">Loading...</div>
+						<div class={styles.loading}>Loading...</div>
 					</Match>
 
 					<Match when={state() === "unsupported"}>
 						<StatusIndicator type="warning" text="Not supported" />
-						<p class="help-text">
+						<p class={styles.helpText}>
 							Your browser doesn't support push notifications.
 							Please use a modern browser like Chrome, Firefox, or Safari.
 						</p>
@@ -136,11 +137,11 @@ export const App: Component = () => {
 
 					<Match when={state() === "denied"}>
 						<StatusIndicator type="warning" text="Notifications blocked" />
-						<p class="help-text">
+						<p class={styles.helpText}>
 							You've blocked notifications for this site. To use nudj, you need to allow notifications.
 						</p>
 						<Collapsible title="How to enable notifications">
-							<div class="help-content">
+							<div class={styles.helpContent}>
 								<p><strong>iOS (Safari):</strong></p>
 								<ol>
 									<li>Open Settings → Safari → nudj</li>
@@ -167,12 +168,12 @@ export const App: Component = () => {
 					<Match when={state() === "enabled" && pairingCode()}>
 						<StatusIndicator type="success" text="Notifications enabled" />
 						<PairingCode code={pairingCode()!} />
-						<p class="help-text">
+						<p class={styles.helpText}>
 							Paste this code into the nudj CLI on your computer to pair.
 						</p>
-						<div class="divider" />
+						<div class={styles.divider} />
 						<Collapsible title="How to use">
-							<div class="help-content">
+							<div class={styles.helpContent}>
 								<ol>
 									<li>Copy the pairing code above</li>
 									<li>
@@ -193,7 +194,7 @@ export const App: Component = () => {
 							</div>
 						</Collapsible>
 						<Collapsible title="Security">
-							<div class="help-content">
+							<div class={styles.helpContent}>
 								<p>Your privacy is protected by design:</p>
 								<ul>
 									<li>The pairing code contains encryption keys — treat it like a password</li>
@@ -201,19 +202,19 @@ export const App: Component = () => {
 									<li>Push services cannot read your notification content</li>
 									<li>The nudj creators have no access to your keys or messages</li>
 								</ul>
-								<div class="security-divider" />
+								<div class={styles.securityDivider} />
 								<p>
 									If you believe your pairing code was compromised, you can reset your subscription below.
 									This generates new encryption keys.
 								</p>
-								<p class="warning-text">
+								<p class={styles.warningText}>
 									<strong>⚠ Important:</strong>
 									{" "}
 									Resetting will disconnect ALL your paired devices.
 									You'll need to re-pair each one.
 								</p>
 								<button
-									class="reset-button"
+									class={styles.resetButton}
 									onClick={handleReset}
 									disabled={isResetting()}
 								>
@@ -226,7 +227,7 @@ export const App: Component = () => {
 					<Match when={state() === "prompt"}>
 						<EnableButton onEnable={handleEnable} />
 						<Collapsible title="How to install this app">
-							<div class="help-content">
+							<div class={styles.helpContent}>
 								<p><strong>iOS (Safari):</strong></p>
 								<ol>
 									<li>Tap the Share button (□↑)</li>
@@ -239,13 +240,13 @@ export const App: Component = () => {
 									<li>Tap "Install app" or "Add to Home Screen"</li>
 									<li>Tap "Install"</li>
 								</ol>
-								<p class="note">
+								<p class={styles.note}>
 									Note: Push notifications work best when the app is installed to your home screen.
 								</p>
 							</div>
 						</Collapsible>
 						<Collapsible title="What is nudj?">
-							<div class="help-content">
+							<div class={styles.helpContent}>
 								<p>
 									nudj lets you send push notifications from your computer to your phone
 									using a simple command-line tool.

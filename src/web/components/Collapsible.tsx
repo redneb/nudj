@@ -1,4 +1,5 @@
 import {type Component, type JSX, createSignal} from "solid-js";
+import styles from "./Collapsible.module.css";
 
 export interface CollapsibleProps {
 	title: string;
@@ -11,19 +12,19 @@ export const Collapsible: Component<CollapsibleProps> = (props) => {
 	const toggle = () => setIsOpen(!isOpen());
 
 	return (
-		<div class="collapsible">
+		<div class={styles.collapsible}>
 			<button
-				class="collapsible__header"
+				class={styles.header}
 				onClick={toggle}
 				aria-expanded={isOpen()}
 			>
-				<span class="collapsible__title">{props.title}</span>
-				<span class={`collapsible__icon ${isOpen() ? "collapsible__icon--open" : ""}`}>
+				<span class={styles.title}>{props.title}</span>
+				<span class={styles.icon} classList={{[styles.iconOpen!]: isOpen()}}>
 					›
 				</span>
 			</button>
 			<div
-				class="collapsible__content"
+				class={styles.content}
 				style={{display: isOpen() ? "block" : "none"}}
 			>
 				{props.children}
