@@ -82,17 +82,35 @@ self.addEventListener("push", (event) => {
 
 	const {title = "nudj", body = "", timestamp = Date.now()} = payload;
 
-	event.waitUntil(
-		self.registration.showNotification(title, {
-			body,
-			icon: "/icon-192.png",
-			badge: "/icon-192.png",
-			tag: `nudj-${timestamp}`,
-		}),
-	);
+	const options: NotificationOptions = {
+		body,
+		icon: "/icon-192.png",
+		badge: "/icon-192.png",
+		tag: `nudj-${timestamp}`,
+	};
+	// Experimental: action buttons (ignored by browsers that don't support it).
+	// TypeScript's DOM lib doesn't include `actions` in NotificationOptions yet.
+	// Remove the `as any` cast when lib.dom.d.ts adds the property.
+	(options as any).actions = [{action: "open", title: "Open App"}];
+	event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Notification click: just close (no action in v1)
+// Notification click: close, and optionally open app
 self.addEventListener("notificationclick", (event) => {
 	event.notification.close();
+
+	if (event.action !== "open") return;
+
+	event.waitUntil(
+		self.clients.matchAll({type: "window", includeUncontrolled: true})
+			.then((windowClients) => {
+				// Focus existing window if found
+				for (const client of windowClients) {
+					if (client.url.startsWith(self.location.origin) && "focus" in client)
+						return client.focus();
+				}
+				// Otherwise open new window
+				return self.clients.openWindow("/");
+			}),
+	);
 });
