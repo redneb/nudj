@@ -1,11 +1,12 @@
-import { defineConfig } from "vite";
+import {defineConfig} from "vitest/config";
 import solid from "vite-plugin-solid";
-import { resolve } from "node:path";
+import {resolve} from "node:path";
 
 const __dirname = import.meta.dirname;
 
 export default defineConfig({
 	root: "src/web",
+	cacheDir: resolve(__dirname, "node_modules/.vite"),
 	plugins: [solid()],
 	build: {
 		outDir: "../../dist/web",
@@ -26,4 +27,25 @@ export default defineConfig({
 		},
 	},
 	publicDir: "../../public",
+	test: {
+		projects: [
+			{
+				test: {
+					name: "cli",
+					root: __dirname,
+					include: ["src/cli/**/*.test.ts"],
+					environment: "node",
+				},
+			},
+			{
+				plugins: [solid()],
+				test: {
+					name: "web",
+					root: __dirname,
+					include: ["src/web/**/*.test.{ts,tsx}"],
+					environment: "jsdom",
+				},
+			},
+		],
+	},
 });
