@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="nudj logo" width="120" height="120">
+</p>
+
 # nudj
 
 **Send push notifications from your CLI to your phone**

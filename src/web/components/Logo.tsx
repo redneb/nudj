@@ -1,4 +1,4 @@
-import logoSvg from "../assets/logo.svg?raw";
+import logoSvg from "../assets/logo-adaptive.svg?raw";
 import styles from "./Logo.module.css";
 
 export const Logo = () => (
