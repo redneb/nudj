@@ -1,5 +1,9 @@
+import {readFileSync} from "node:fs";
 import {nodeResolve} from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
 import typescript from "@rollup/plugin-typescript";
+
+const pkg = JSON.parse(readFileSync("package.json", "utf-8"));
 
 export default {
 	input: "src/cli/index.ts",
@@ -19,6 +23,19 @@ export default {
 			moduleResolution: "NodeNext",
 			// Disable sourcemaps for distribution - no .map file will be shipped
 			sourceMap: false,
+		}),
+		// Runs after TypeScript so it operates on compiled JS, not raw .ts.
+		// Replaces the readVersionFromPackageJson() call with a string literal,
+		// turning the function into dead code that rollup tree-shakes away.
+		replace({
+			include: ["src/cli/version.ts"],
+			preventAssignment: true,
+			delimiters: ["", ""],
+			values: {
+				// Includes the trailing semicolon to avoid matching the
+				// function declaration (`function readVersionFromPackageJson() {`).
+				"readVersionFromPackageJson();": `${JSON.stringify(pkg.version)};`,
+			},
 		}),
 	],
 	external: [/^node:/],

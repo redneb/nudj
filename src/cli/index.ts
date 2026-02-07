@@ -4,11 +4,12 @@ import {pushCommand} from "./commands/push.ts";
 import {pairCommand} from "./commands/pair.ts";
 import {receiversCommand} from "./commands/receivers.ts";
 import {configCommand} from "./commands/config.ts";
+import {VERSION} from "./version.ts";
 
 const main = defineCommand({
 	meta: {
 		name: "nudj",
-		version: "0.1.0",
+		version: VERSION,
 		description: "Send push notifications from your CLI to your phone",
 	},
 	subCommands: {
