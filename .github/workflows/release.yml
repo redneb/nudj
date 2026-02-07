@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +27,8 @@ jobs:
 
       - run: npm run build:cli:bundle
 
-      # Publish to npm (requires NPM_TOKEN secret)
+      # Publish to npm (provenance via OIDC, no secret needed)
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Create GitHub Release with bundled CLI
       - uses: softprops/action-gh-release@v2
