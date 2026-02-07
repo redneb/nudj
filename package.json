@@ -64,5 +64,6 @@
 		"pwa",
 		"web-push"
 	],
-	"license": "MIT"
+	"license": "MIT",
+	"homepage": "https://github.com/redneb/nudj"
 }
