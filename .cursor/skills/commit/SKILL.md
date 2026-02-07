@@ -1,3 +1,9 @@
+---
+name: commit
+description: Commit (staged only)
+disable-model-invocation: true
+---
+
 # Commit (staged only)
 
 Create a git commit for the **already-staged** changes in this repo.

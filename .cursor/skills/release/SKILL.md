@@ -1,3 +1,9 @@
+---
+name: release
+description: Release (version bump)
+disable-model-invocation: true
+---
+
 # Release (version bump)
 
 Cut a new release by bumping the **SemVer** version and committing the bump.
