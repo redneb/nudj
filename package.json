@@ -1,6 +1,6 @@
 {
 	"name": "nudj",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"description": "Send push notifications from your CLI to your phone",
 	"type": "module",
 	"bin": {
