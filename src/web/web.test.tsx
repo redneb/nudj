@@ -43,6 +43,10 @@ describe("vapid", () => {
 });
 
 describe("storage", () => {
+	// 65-byte uncompressed P-256 public key (0x04 prefix + 64 zero bytes), base64url-encoded
+	const fakePublicKey = "B" + "A".repeat(86);
+	const fakePrivateKey = "dGVzdC1wcml2YXRlLWtleQ";
+
 	beforeEach(() => {
 		localStorage.clear();
 	});
@@ -58,8 +62,8 @@ describe("storage", () => {
 
 	it("should store and retrieve keys", () => {
 		const testKeys = {
-			publicKey: "test-public-key",
-			privateKey: "test-private-key",
+			publicKey: fakePublicKey,
+			privateKey: fakePrivateKey,
 		};
 
 		setVapidKeys(testKeys);
@@ -72,8 +76,8 @@ describe("storage", () => {
 
 	it("should clear keys", () => {
 		setVapidKeys({
-			publicKey: "test-public-key",
-			privateKey: "test-private-key",
+			publicKey: fakePublicKey,
+			privateKey: fakePrivateKey,
 		});
 
 		clearVapidKeys();
