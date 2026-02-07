@@ -24,6 +24,7 @@ export const App: Component = () => {
 	const [state, setState] = createSignal<AppState>("loading");
 	const [pairingCode, setPairingCode] = createSignal<string | null>(null);
 	const [isResetting, setIsResetting] = createSignal(false);
+	const [isDisabling, setIsDisabling] = createSignal(false);
 
 	onMount(async () => {
 		// Register service worker first
@@ -111,6 +112,22 @@ export const App: Component = () => {
 		}
 		finally {
 			setIsResetting(false);
+		}
+	};
+
+	const handleDisable = async () => {
+		setIsDisabling(true);
+		try {
+			await unsubscribe();
+			clearVapidKeys();
+			setPairingCode(null);
+			setState("prompt");
+		}
+		catch (error) {
+			console.error("Failed to disable:", error);
+		}
+		finally {
+			setIsDisabling(false);
 		}
 	};
 
@@ -202,23 +219,46 @@ export const App: Component = () => {
 									<li>Push services cannot read your notification content</li>
 									<li>The nudj creators have no access to your keys or messages</li>
 								</ul>
-								<div class={styles.securityDivider} />
 								<p>
-									If you believe your pairing code was compromised, you can reset your subscription below.
-									This generates new encryption keys.
-								</p>
-								<p class={styles.warningText}>
-									<strong>⚠ Important:</strong>
+									If you believe your pairing code was compromised,
+									you can reset your subscription under
 									{" "}
-									Resetting will disconnect ALL your paired devices.
-									You'll need to re-pair each one.
+									<strong>Manage</strong>
+									{" "}
+									below.
+								</p>
+							</div>
+						</Collapsible>
+						<Collapsible title="Manage">
+							<div class={styles.helpContent}>
+								<p><strong>Reset Subscription</strong></p>
+								<p>
+									Generates new encryption keys and a new pairing code
+									while keeping notifications active. Use this if your
+									pairing code was compromised. All paired devices will
+									need to re-pair.
 								</p>
 								<button
 									class={styles.resetButton}
 									onClick={handleReset}
-									disabled={isResetting()}
+									disabled={isResetting() || isDisabling()}
 								>
 									{isResetting() ? "Resetting..." : "Reset Subscription"}
+								</button>
+								<div class={styles.divider} />
+								<p><strong>Disable Notifications</strong></p>
+								<p>
+									Removes your push subscription and deletes your
+									encryption keys from this device. The app returns
+									to its initial state. You can re-enable notifications
+									at any time, but you will need to re-pair all your devices.
+								</p>
+								<button
+									class={styles.resetButton}
+									onClick={handleDisable}
+									disabled={isDisabling() || isResetting()}
+								>
+									{isDisabling() ? "Disabling..." : "Disable Notifications"}
 								</button>
 							</div>
 						</Collapsible>

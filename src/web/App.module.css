@@ -100,13 +100,6 @@
 	opacity: 0.8;
 }
 
-/* Security section */
-.securityDivider {
-	height: 1px;
-	background: var(--color-border);
-	margin: var(--spacing-md) 0;
-}
-
 .warningText {
 	color: var(--color-warning);
 	font-size: 0.85rem;
