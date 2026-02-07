@@ -28,7 +28,7 @@ jobs:
       - run: npm run build:cli:bundle
 
       # Publish to npm (provenance via OIDC, no secret needed)
-      - run: npm publish
+      - run: npm publish --provenance
 
       # Create GitHub Release with bundled CLI
       - uses: softprops/action-gh-release@v2
