@@ -1,12 +1,10 @@
-# DISABLED: Enable this workflow after setting up GitHub Pages
-# To enable: uncomment the 'push' trigger below and configure Pages in repo settings
 name: Deploy Web
 
 on:
-  # push:
-  #   tags:
-  #     - "v*"
-  workflow_dispatch:  # Manual trigger only for now
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 permissions:
   contents: read

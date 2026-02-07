@@ -1,12 +1,10 @@
-# DISABLED: Enable this workflow after setting up npm publishing
-# To enable: uncomment the 'push' trigger below and add NPM_TOKEN secret
 name: Release
 
 on:
-  # push:
-  #   tags:
-  #     - "v*"
-  workflow_dispatch:  # Manual trigger only for now
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
 
 jobs:
   build:
