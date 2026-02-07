@@ -82,10 +82,11 @@ self.addEventListener("push", (event) => {
 
 	const {title = "nudj", body = "", timestamp = Date.now()} = payload;
 
+	const baseUrl = self.registration.scope;
 	const options: NotificationOptions = {
 		body,
-		icon: "/icon-192.png",
-		badge: "/icon-192.png",
+		icon: new URL("icon-192.png", baseUrl).href,
+		badge: new URL("icon-192.png", baseUrl).href,
 		tag: `nudj-${timestamp}`,
 	};
 	// Experimental: action buttons (ignored by browsers that don't support it).
@@ -110,7 +111,7 @@ self.addEventListener("notificationclick", (event) => {
 						return client.focus();
 				}
 				// Otherwise open new window
-				return self.clients.openWindow("/");
+				return self.clients.openWindow(self.registration.scope);
 			}),
 	);
 });

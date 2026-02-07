@@ -5,6 +5,7 @@ import {resolve} from "node:path";
 const __dirname = import.meta.dirname;
 
 export default defineConfig({
+	base: "./",
 	root: "src/web",
 	cacheDir: resolve(__dirname, "node_modules/.vite"),
 	plugins: [solid()],
