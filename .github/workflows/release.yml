@@ -17,8 +17,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - run: npm ci
 
@@ -26,8 +27,8 @@ jobs:
 
       - run: npm run build:cli:bundle
 
-      # Publish to npm (provenance via OIDC, no secret needed)
-      - run: npm publish --provenance
+      # Publish to npm (OIDC via trusted publisher, no secret needed)
+      - run: npm publish
 
       # Create GitHub Release with bundled CLI
       - uses: softprops/action-gh-release@v2
