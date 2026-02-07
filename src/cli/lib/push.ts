@@ -9,6 +9,104 @@ export interface PushResult {
 	expired?: boolean;
 }
 
+const encoder = new TextEncoder();
+
+/** Maximum encrypted payload size accepted by push services (RFC 8030). */
+const MAX_ENCRYPTED_BYTES = 4_096;
+
+/**
+ * aes128gcm encryption overhead (RFC 8188 / 8291):
+ * 16 (salt) + 4 (record size) + 1 (key ID len) + 65 (key ID) + 1 (padding) + 16 (AEAD tag)
+ */
+const ENCRYPTION_OVERHEAD = 103;
+
+/** Maximum plaintext bytes available for the JSON payload. */
+const MAX_PLAINTEXT_BYTES = MAX_ENCRYPTED_BYTES - ENCRYPTION_OVERHEAD;
+
+const TRUNCATION_MARKER = "…";
+
+/**
+ * Ensure the payload fits within the Web Push encrypted-payload size limit.
+ * Truncates body first, then title if needed, appending "…" to indicate truncation.
+ */
+export function fitPayload(
+	payload: NotificationPayload,
+): {payload: NotificationPayload, truncated: boolean} {
+	if (payloadByteSize(payload) <= MAX_PLAINTEXT_BYTES)
+		return {payload, truncated: false};
+
+	// Stage 1: truncate body (keep original title)
+	const truncatedBody = binarySearchTruncate(
+		payload.body,
+		candidate => payloadByteSize({...payload, body: candidate + TRUNCATION_MARKER}),
+	);
+
+	if (truncatedBody !== null) {
+		return {
+			payload: {...payload, body: truncatedBody + TRUNCATION_MARKER},
+			truncated: true,
+		};
+	}
+
+	// Stage 2: body fully removed and still too large — truncate title too
+	const truncatedTitle = binarySearchTruncate(
+		payload.title,
+		candidate => payloadByteSize({
+			...payload,
+			title: candidate + TRUNCATION_MARKER,
+			body: "",
+		}),
+	);
+
+	if (truncatedTitle !== null) {
+		return {
+			payload: {
+				...payload,
+				title: truncatedTitle + TRUNCATION_MARKER,
+				body: "",
+			},
+			truncated: true,
+		};
+	}
+
+	// Unreachable in practice — even an empty title + body is well under the limit.
+	throw new Error("Notification payload exceeds push size limit even when empty.");
+}
+
+/** Compute the UTF-8 byte length of the JSON-serialized payload data. */
+function payloadByteSize(payload: NotificationPayload): number {
+	return encoder.encode(JSON.stringify({
+		title: payload.title,
+		body: payload.body,
+		timestamp: payload.timestamp,
+	})).byteLength;
+}
+
+/**
+ * Binary-search for the longest prefix of `text` where `measure(prefix) <= MAX_PLAINTEXT_BYTES`.
+ * Returns the prefix, or `null` if even an empty string exceeds the limit.
+ */
+function binarySearchTruncate(
+	text: string,
+	measure: (candidate: string) => number,
+): string | null {
+	if (measure("") > MAX_PLAINTEXT_BYTES)
+		return null;
+
+	let lo = 0;
+	let hi = text.length;
+
+	while (lo < hi) {
+		const mid = Math.ceil((lo + hi) / 2);
+		if (measure(text.slice(0, mid)) <= MAX_PLAINTEXT_BYTES)
+			lo = mid;
+		else
+			hi = mid - 1;
+	}
+
+	return text.slice(0, lo);
+}
+
 /**
  * Send a push notification to a receiver.
  */
@@ -63,6 +161,19 @@ export async function sendPush(
 
 		// Other errors
 		const errorText = await response.text().catch(() => "");
+
+		// Surface a clear message for payload-too-large rejections
+		if (
+			response.status === 413
+			|| (response.status === 400 && /size|too large|4096/i.test(errorText))
+		) {
+			return {
+				name: receiver.name,
+				success: false,
+				error: "payload too large for push service",
+			};
+		}
+
 		return {
 			name: receiver.name,
 			success: false,

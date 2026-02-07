@@ -1,8 +1,7 @@
 import {defineCommand} from "citty";
 import {text} from "node:stream/consumers";
 import {getReceivers, updateReceiverLastUsed, removeReceiver} from "../lib/config.ts";
-import {sendPush} from "../lib/push.ts";
-import type {NotificationPayload} from "../../common/types.ts";
+import {sendPush, fitPayload} from "../lib/push.ts";
 
 export const pushCommand = defineCommand({
 	meta: {
@@ -62,12 +61,15 @@ export const pushCommand = defineCommand({
 			}
 		}
 
-		// Create payload
-		const payload: NotificationPayload = {
+		// Create payload, truncating if it would exceed the push size limit
+		const {payload, truncated} = fitPayload({
 			title: args.title,
 			body: message,
 			timestamp: Date.now(),
-		};
+		});
+
+		if (truncated)
+			console.error("\u26a0 Message truncated to fit push notification size limit");
 
 		// Send notifications, processing each result as it completes
 		let hasFailure = false;
