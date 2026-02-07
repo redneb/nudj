@@ -54,6 +54,12 @@ export const App: Component = () => {
 				setState("enabled");
 				return;
 			}
+
+			// Desync: clean up whichever half remains so re-enabling starts clean
+			if (subscription)
+				await unsubscribe();
+			if (vapidKeys)
+				clearVapidKeys();
 		}
 
 		setState("prompt");
@@ -71,20 +77,29 @@ export const App: Component = () => {
 		if (permission !== "granted")
 			return;
 
-		// Generate or get VAPID keys
-		let vapidKeys = getVapidKeys();
-		if (!vapidKeys) {
-			vapidKeys = await generateVapidKeys();
-			setVapidKeys(vapidKeys);
+		try {
+			// Generate or get VAPID keys
+			let vapidKeys = getVapidKeys();
+			if (!vapidKeys) {
+				vapidKeys = await generateVapidKeys();
+				setVapidKeys(vapidKeys);
+			}
+
+			// Create subscription
+			const subscription = await createSubscription(vapidKeys.publicKey);
+
+			// Generate pairing code
+			const code = generatePairingCode(subscription, vapidKeys.privateKey);
+			setPairingCode(code);
+			setState("enabled");
 		}
+		catch (error) {
+			console.error("Failed to enable notifications:", error);
 
-		// Create subscription
-		const subscription = await createSubscription(vapidKeys.publicKey);
-
-		// Generate pairing code
-		const code = generatePairingCode(subscription, vapidKeys.privateKey);
-		setPairingCode(code);
-		setState("enabled");
+			// Clean up partial state so the next attempt starts fresh
+			await unsubscribe();
+			clearVapidKeys();
+		}
 	};
 
 	const handleReset = async () => {
