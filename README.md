@@ -14,7 +14,7 @@
 
 ## What is nudj?
 
-nudj lets you send push notifications from your computer to your phone using a simple command-line tool. No account required, no cloud service — just a direct connection between your devices.
+nudj lets you send push notifications from your computer to your phone using a simple command-line tool. No account required, no servers — just Web Push and end-to-end encryption.
 
 ### Features
 
@@ -117,7 +117,7 @@ nudj is designed with privacy as a core principle:
 
 - **No accounts** — You don't need to sign up for anything
 - **No cloud storage** — Your credentials stay on your devices
-- **No backend** — nudj has no server component; whoever hosts the PWA has no data to log or access
+- **No server** — nudj operates no servers and stores none of your data
 - **End-to-end encryption** — Messages are encrypted using Web Push standards (RFC 8291)
 - **No tracking** — The app creator has no access to your data
 

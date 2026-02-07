@@ -293,7 +293,7 @@ export const App: Component = () => {
 								</p>
 								<ul>
 									<li>No account required</li>
-									<li>No cloud service — your data stays yours</li>
+									<li>No server — nudj operates no servers and stores none of your data</li>
 									<li>End-to-end encrypted — only you can read your notifications</li>
 								</ul>
 							</div>

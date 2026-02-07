@@ -561,7 +561,7 @@ from the browser's address bar (look for an install icon).
 nudj lets you send push notifications from your computer 
 to your phone using a simple command-line tool.
 
-No account required. No cloud service. Your notifications 
+No account required. No server. Your notifications 
 are encrypted end-to-end.
 ```
 
