@@ -52,7 +52,7 @@ Requires Node.js 22 or later.
 
 ### 1. Install the PWA on your phone
 
-Visit **[https://redneb.github.io/nudj/](https://redneb.github.io/nudj/)** on your phone.
+Visit **[https://nudj.atopon.net](https://nudj.atopon.net)** on your phone.
 
 **iOS users must install it as an app** (required for push notifications):
 
