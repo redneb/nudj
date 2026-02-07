@@ -1,7 +1,7 @@
 import {defineCommand} from "citty";
 import {text} from "node:stream/consumers";
 import {getReceivers, updateReceiverLastUsed, removeReceiver} from "../lib/config.ts";
-import {sendPushToReceivers} from "../lib/push.ts";
+import {sendPush} from "../lib/push.ts";
 import type {NotificationPayload} from "../../common/types.ts";
 
 export const pushCommand = defineCommand({
@@ -69,12 +69,10 @@ export const pushCommand = defineCommand({
 			timestamp: Date.now(),
 		};
 
-		// Send notifications
-		const results = await sendPushToReceivers(targetReceivers, payload);
-
-		// Process results
+		// Send notifications, processing each result as it completes
 		let hasFailure = false;
-		for (const result of results) {
+		await Promise.all(targetReceivers.map(async (receiver) => {
+			const result = await sendPush(receiver, payload);
 			if (result.success) {
 				updateReceiverLastUsed(result.name);
 				if (!args.quiet)
@@ -89,7 +87,7 @@ export const pushCommand = defineCommand({
 				else
 					console.error(`✗ ${result.name}: ${result.error}`);
 			}
-		}
+		}));
 
 		if (hasFailure)
 			process.exit(1);

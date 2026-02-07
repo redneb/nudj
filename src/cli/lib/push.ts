@@ -139,16 +139,3 @@ async function deriveVapidKeys(
 		privateKey: bytesToBase64Url(base64UrlToBytes(jwk.d)),
 	};
 }
-
-/**
- * Send push notifications to multiple receivers.
- */
-export async function sendPushToReceivers(
-	receivers: ReceiverConfig[],
-	payload: NotificationPayload,
-): Promise<PushResult[]> {
-	const results = await Promise.all(
-		receivers.map(receiver => sendPush(receiver, payload)),
-	);
-	return results;
-}
