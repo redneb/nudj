@@ -196,7 +196,9 @@ export const App: Component = () => {
 									<li>
 										On your computer, install the nudj CLI:
 										<pre><code>npm install -g nudj</code></pre>
-										Or download from GitHub Releases
+										Or
+										{" "}
+										<a href="./nudj.js" download="nudj.js">download the standalone script</a>
 									</li>
 									<li>
 										Run:

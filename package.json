@@ -18,7 +18,7 @@
 		"build": "npm run build:cli && npm run build:web",
 		"build:cli": "tsc -b src/common/tsconfig.json && tsc -p src/cli/tsconfig.json",
 		"build:cli:bundle": "tsc -b src/common/tsconfig.json && rollup -c",
-		"build:web": "vite build",
+		"build:web": "vite build && npm run build:cli:bundle && cp dist/nudj.js dist/web/nudj.js",
 		"preview:web": "vite preview",
 		"test": "vitest",
 		"test:cli": "vitest --project cli",
