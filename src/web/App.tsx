@@ -1,4 +1,4 @@
-import {type Component, createSignal, Switch, Match, onMount} from "solid-js";
+import {type Component, createSignal, Show, Switch, Match, onMount} from "solid-js";
 import {Collapsible} from "./components/Collapsible.tsx";
 import {EnableButton} from "./components/EnableButton.tsx";
 import {Logo} from "./components/Logo.tsx";
@@ -18,13 +18,31 @@ import {
 import {generatePairingCode} from "./lib/pairing.ts";
 import styles from "./App.module.css";
 
-type AppState = "loading" | "unsupported" | "prompt" | "denied" | "enabled";
+type AppState = "loading" | "unsupported" | "prompt" | "denied" | "enabled" | "recover" | "subscriptionLost";
 
 export const App: Component = () => {
 	const [state, setState] = createSignal<AppState>("loading");
 	const [pairingCode, setPairingCode] = createSignal<string | null>(null);
 	const [isResetting, setIsResetting] = createSignal(false);
 	const [isDisabling, setIsDisabling] = createSignal(false);
+
+	const getDisplayMode = (): string => {
+		if (window.matchMedia("(display-mode: standalone)").matches)
+			return "standalone";
+		if (window.matchMedia("(display-mode: minimal-ui)").matches)
+			return "minimal-ui";
+		if (window.matchMedia("(display-mode: fullscreen)").matches)
+			return "fullscreen";
+		return "browser";
+	};
+
+	const shouldShowAndroidInstallFirstHint = (): boolean => {
+		const userAgent = navigator.userAgent;
+		const isAndroid = /Android/i.test(userAgent);
+		const isChrome = /Chrome\//i.test(userAgent);
+		const isKnownAlternativeBrowser = /EdgA|OPR|SamsungBrowser/i.test(userAgent);
+		return isAndroid && isChrome && !isKnownAlternativeBrowser && getDisplayMode() === "browser";
+	};
 
 	onMount(async () => {
 		// Register service worker first
@@ -55,11 +73,34 @@ export const App: Component = () => {
 				return;
 			}
 
-			// Desync: clean up whichever half remains so re-enabling starts clean
-			if (subscription)
+			// A subscription without keys is unusable, so clear it and prompt to re-enable.
+			if (subscription) {
 				await unsubscribe();
-			if (vapidKeys)
-				clearVapidKeys();
+				setState("prompt");
+				return;
+			}
+
+			// Keys with no subscription likely means Chrome rotated/expired the subscription.
+			// Keep keys for debugging and ask the user to re-enable.
+			if (vapidKeys) {
+				setState("subscriptionLost");
+				return;
+			}
+		}
+
+		// Post-install recovery: Chrome Android may reset installed PWAs to
+		// "default" permission and drop their push subscription.
+		if (permission === "default") {
+			const vapidKeys = getVapidKeys();
+			if (vapidKeys) {
+				const subscription = await getSubscription();
+				if (subscription) {
+					setState("recover");
+					return;
+				}
+				setState("subscriptionLost");
+				return;
+			}
 		}
 
 		setState("prompt");
@@ -99,6 +140,30 @@ export const App: Component = () => {
 			// Clean up partial state so the next attempt starts fresh
 			await unsubscribe();
 			clearVapidKeys();
+		}
+	};
+
+	const handleRecover = async () => {
+		const permission = await requestPermission();
+
+		if (permission === "denied") {
+			setState("denied");
+			return;
+		}
+
+		if (permission !== "granted")
+			return;
+
+		const subscription = await getSubscription();
+		const vapidKeys = getVapidKeys();
+
+		if (subscription && vapidKeys) {
+			setPairingCode(generatePairingCode(subscription, vapidKeys.privateKey));
+			setState("enabled");
+		}
+		else {
+			// Subscription expired or was revoked - fall through to full setup
+			await handleEnable();
 		}
 	};
 
@@ -197,12 +262,39 @@ export const App: Component = () => {
 						</Collapsible>
 					</Match>
 
+					<Match when={state() === "recover"}>
+						<StatusIndicator type="warning" text="Re-enable required" />
+						<p class={styles.helpText}>
+							You previously enabled notifications in the browser.
+							The installed app needs its own permission — your
+							pairing code will stay the same.
+						</p>
+						<EnableButton onEnable={handleRecover} />
+					</Match>
+
+					<Match when={state() === "subscriptionLost"}>
+						<StatusIndicator type="warning" text="Setup needs refresh" />
+						<p class={styles.helpText}>
+							Your notification subscription is no longer available.
+							Re-enable notifications to create a new pairing code,
+							then re-pair all sender devices.
+						</p>
+						<EnableButton onEnable={handleEnable} />
+					</Match>
+
 					<Match when={state() === "enabled" && pairingCode()}>
 						<StatusIndicator type="success" text="Notifications enabled" />
 						<PairingCode code={pairingCode()!} />
 						<p class={styles.helpText}>
 							Paste this code into the nudj CLI on your computer to pair.
 						</p>
+						<Show when={shouldShowAndroidInstallFirstHint()}>
+							<p class={styles.note}>
+								If you install nudj to your home screen now, Chrome
+								may reset this notification setup. If that happens,
+								re-enable notifications and re-pair all sender devices.
+							</p>
+						</Show>
 						<div class={styles.divider} />
 						<Collapsible title="How to use">
 							<div class={styles.helpContent}>
@@ -298,7 +390,11 @@ export const App: Component = () => {
 									<li>Tap "Install"</li>
 								</ol>
 								<p class={styles.note}>
-									Note: Push notifications work best when the app is installed to your home screen.
+									Tip (Android): If you plan to install nudj to your home
+									screen ("Install app" / "Add to Home Screen"), do that
+									before enabling notifications. Installing later may
+									require re-enabling notifications and re-pairing all
+									sender devices.
 								</p>
 							</div>
 						</Collapsible>
