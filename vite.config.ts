@@ -3,12 +3,23 @@ import solid from "vite-plugin-solid";
 import {resolve} from "node:path";
 
 const __dirname = import.meta.dirname;
+const useDevManifest = process.env.NUDJ_DEV_MANIFEST === "1";
+const manifestFile = useDevManifest ? "manifest.dev.json" : "manifest.json";
+const titleSuffix = useDevManifest ? " (dev)" : "";
 
 export default defineConfig({
 	base: "./",
 	root: "src/web",
 	cacheDir: resolve(__dirname, "node_modules/.vite"),
-	plugins: [solid()],
+	plugins: [
+		solid(),
+		{
+			name: "nudj-manifest-file",
+			transformIndexHtml: (html) => html
+				.replace("{{NUDJ_MANIFEST_FILE}}", manifestFile)
+				.replace("{{NUDJ_TITLE_SUFFIX}}", titleSuffix),
+		},
+	],
 	build: {
 		outDir: "../../dist/web",
 		emptyOutDir: true,

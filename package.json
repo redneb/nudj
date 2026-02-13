@@ -14,7 +14,7 @@
 	},
 	"scripts": {
 		"dev:cli": "tsx src/cli/index.ts",
-		"dev:web": "vite",
+		"dev:web": "NUDJ_DEV_MANIFEST=1 vite",
 		"build": "npm run build:cli && npm run build:web",
 		"build:cli": "tsc -b src/common/tsconfig.json && tsc -p src/cli/tsconfig.json",
 		"build:cli:bundle": "tsc -b src/common/tsconfig.json && rollup -c",
