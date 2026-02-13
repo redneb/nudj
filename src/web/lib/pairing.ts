@@ -33,12 +33,14 @@ export function generatePairingCode(
 	if (!p256dhKey || !authKey)
 		throw new Error("Failed to get subscription keys");
 
+	// Keep high-entropy fields near both ends of the serialized JSON.
+	// Users usually compare the beginning first and the end when copying/pasting.
 	const pairingData: PairingData = {
-		endpoint: subscription.endpoint,
 		keys: {
-			p256dh: arrayBufferToBase64Url(p256dhKey),
 			auth: arrayBufferToBase64Url(authKey),
+			p256dh: arrayBufferToBase64Url(p256dhKey),
 		},
+		endpoint: subscription.endpoint,
 		vapid: {
 			privateKey: vapidPrivateKey,
 		},
