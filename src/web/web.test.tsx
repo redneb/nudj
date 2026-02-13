@@ -1,7 +1,6 @@
 import {describe, it, expect, beforeEach, afterEach} from "vitest";
 import {generateVapidKeys, base64UrlToUint8Array} from "./lib/vapid.ts";
 import {getVapidKeys, setVapidKeys, clearVapidKeys} from "./lib/storage.ts";
-import {truncatePairingCode} from "./lib/pairing.ts";
 
 describe("vapid", () => {
 	it("should generate valid VAPID key pair", async () => {
@@ -84,23 +83,5 @@ describe("storage", () => {
 		const keys = getVapidKeys();
 
 		expect(keys).toBeNull();
-	});
-});
-
-describe("pairing", () => {
-	it("should truncate long pairing codes", () => {
-		const longCode = "eyJlbmRwb2ludCI6Imh0dHBzOi8vZmNtLmdvb2dsZWFwaXMuY29tL2ZjbS9zZW5kL2FiYzEyMy4uLiIsImtleXMiOnsicDI1NmRoIjoiQk5jUmRyZWFMUkZYVGtPT1VISzFFdEsyd3RhejVSeTRZZllDQS4uLiIsImF1dGgiOiJ0QkhJdEpJNXN2YnBlejdLSTRDQ1hnIn0sInZhcGlkIjp7InByaXZhdGVLZXkiOiJkR2hwY3lCcGN5QmhJSFJsYzNRZ2EyVjVMaTR1In19";
-
-		const truncated = truncatePairingCode(longCode);
-
-		expect(truncated).toContain("...");
-		expect(truncated.length).toBeLessThan(longCode.length);
-		expect(truncated.startsWith("eyJlbmRwb2lu")).toBe(true);
-	});
-
-	it("should not truncate short codes", () => {
-		const shortCode = "abc123";
-		const truncated = truncatePairingCode(shortCode);
-		expect(truncated).toBe(shortCode);
 	});
 });

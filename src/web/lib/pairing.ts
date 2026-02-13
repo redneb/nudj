@@ -49,13 +49,3 @@ export function generatePairingCode(
 	const bytes = new TextEncoder().encode(json);
 	return arrayBufferToBase64Url(bytes.buffer);
 }
-
-/**
- * Truncate pairing code for display with ellipsis.
- */
-export function truncatePairingCode(code: string, startChars = 12, endChars = 5): string {
-	if (code.length <= startChars + endChars + 3)
-		return code;
-
-	return `${code.slice(0, startChars)}...${code.slice(-endChars)}`;
-}

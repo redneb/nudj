@@ -1,5 +1,4 @@
 import {type Component, createSignal} from "solid-js";
-import {truncatePairingCode} from "../lib/pairing.ts";
 import styles from "./PairingCode.module.css";
 
 export interface PairingCodeProps {
@@ -23,7 +22,7 @@ export const PairingCode: Component<PairingCodeProps> = (props) => {
 	return (
 		<div class={styles.container}>
 			<code class={styles.text}>
-				{truncatePairingCode(props.code)}
+				{props.code}
 			</code>
 			<button
 				class={styles.button}

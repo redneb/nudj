@@ -12,8 +12,10 @@
 	flex: 1;
 	font-family: var(--font-mono);
 	font-size: 0.95rem;
-	word-break: break-all;
 	color: var(--color-text);
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .button {
