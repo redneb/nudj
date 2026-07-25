@@ -20,7 +20,7 @@ nudj lets you send push notifications from your computer to your phone using a s
 
 - 🔒 **End-to-end encrypted** — Only you can read your notifications
 - 🚫 **No account required** — No sign-up, no login, no tracking
-- 🌐 **Works everywhere** — Uses standard Web Push (works on iOS, Android, and desktop)
+- 🌐 **Cross-platform** — Uses standard Web Push on supported iOS, Android, and desktop browsers
 - ⚡ **Lightweight** — Single-file CLI, ~18KB PWA
 - 🔓 **Open source** — MIT licensed, fully auditable
 
@@ -57,7 +57,7 @@ Visit **[https://nudj.atopon.net](https://nudj.atopon.net)** on your phone.
 **iOS users must install it as an app** (required for push notifications):
 
 - **iOS**: Safari → Share → "Add to Home Screen" (required)
-- **Android**: Chrome → Menu → "Install app" (optional — or just use the website)
+- **Android**: Chrome → Menu → "Install app" (optional — or just use the website). If notifications are delayed while your phone is idle, see [Notification delivery troubleshooting](#notification-delivery-troubleshooting).
 
 Then tap **Enable Notifications** in the app.
 
@@ -78,6 +78,37 @@ nudj push 'Hello from my computer!'
 ```
 
 That's it! You should see a notification on your phone.
+
+---
+
+## Notification delivery troubleshooting
+
+nudj requests high-urgency delivery, but the operating system, browser, and push service ultimately control when a notification arrives.
+
+### Android
+
+If notifications are delayed while your phone is idle:
+
+1. Open Android **Settings → Apps → Chrome → Battery** (the exact path varies by device).
+2. Enable background usage and select **Unrestricted** battery usage.
+3. Ensure Chrome can use background data.
+4. Remove Chrome from any manufacturer-specific "sleeping apps" or battery-saving list.
+5. Do not force-stop Chrome. Closing Chrome or swiping it away from recent apps should normally be fine.
+
+Apply these settings to **Chrome**, not only to the installed nudj app. Chrome receives the Web Push message and starts nudj's service worker.
+
+These changes can improve delivery while the phone is in a low-power state, but immediate delivery is not guaranteed. Unrestricted battery usage may also increase Chrome's background battery consumption.
+
+### iOS and iPadOS
+
+Web Push requires nudj to be installed as a Home Screen app. If notifications are missing or delayed:
+
+1. Open **Settings → Apps → nudj → Notifications** and enable **Allow Notifications**.
+2. Ensure nudj notifications are delivered immediately rather than through Scheduled Summary.
+3. Check whether a Focus mode is suppressing nudj.
+4. If delivery has stopped entirely, remove and reinstall the Home Screen app, then pair it again.
+
+nudj requests immediate Web Push delivery on Apple devices, but this does not override Focus, Scheduled Summary, or other notification settings.
 
 ---
 

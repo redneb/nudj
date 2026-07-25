@@ -123,7 +123,10 @@ export async function sendPush(
 					body: payload.body,
 					timestamp: payload.timestamp,
 				},
-				options: {ttl: 86_400},
+				options: {
+					ttl: 86_400,
+					urgency: "high",
+				},
 			},
 			{
 				endpoint: receiver.endpoint,
