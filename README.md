@@ -112,6 +112,18 @@ nudj requests immediate Web Push delivery on Apple devices, but this does not ov
 
 ---
 
+## Self-hosting
+
+The canonical deployment at [nudj.atopon.net](https://nudj.atopon.net) is built from this repository and deployed to GitHub Pages by GitHub Actions whenever a `v*` version tag is pushed.
+
+The nudj web app is entirely static and has no application backend. It can be hosted by any static host, including under a URL subpath, but must be served over HTTPS. Run `npm run build:web` and deploy the contents of `dist/web`.
+
+Under normal operation, subscription credentials, VAPID keys, and notification contents remain on users' devices and are never sent to the web host. Users of any deployment — including the canonical deployment — must nevertheless trust the JavaScript and service worker served by its origin. A compromised hosting account, domain, or modified build could access locally stored credentials and notification contents. Self-hosting lets users control this trust boundary by reviewing and deploying the source themselves.
+
+Browser storage is isolated by origin, while push subscriptions are tied to a service worker registration. Moving to another origin, or changing the deployment path, creates a new subscription context and requires pairing again; an installed PWA must also be reinstalled.
+
+---
+
 ## CLI Reference
 
 ### Send a notification
